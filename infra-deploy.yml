@@ -167,7 +167,7 @@ Resources:
                 - Key: Name 
                   Value: !Sub ${EnvironmentName} Private Routes (AZ1)
 
-    DefaultPrivateRoute: 
+    DefaultPrivateRoute1: 
         Type: AWS::EC2::Route
         Properties: 
             RouteTableId: !Ref PrivateRouteTable1
@@ -188,7 +188,7 @@ Resources:
                 - Key: Name 
                   Value: !Sub ${EnvironmentName} Private Routes (AZ2)
 
-    DefaultPrivateRoute: 
+    DefaultPrivateRoute2: 
         Type: AWS::EC2::Route
         Properties: 
             RouteTableId: !Ref PrivateRouteTable2
