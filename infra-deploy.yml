@@ -79,7 +79,7 @@ Resources:
         Properties:
             VpcId: !Ref VPC
             AvailabilityZone: !Select [ 1, !GetAZs '' ]
-            CidrBlock: !Ref 10.0.1.0/24
+            CidrBlock: !Ref PublicSubnet2CIDR
             MagPubliconLaunch: true
             Tags:
                 -Key: Name
@@ -89,19 +89,19 @@ Resources:
         Type: AWS::EC2::Subnet
         Properties:
             VpcId: !Ref VPC
-            AvailabilityZone: !select [0,!GetAZs '' ]
-            CidrBlock: !Ref Privatesubnet1CIDR
+            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet1CIDR
             MagPubliconLaunch: true
             Tags:
                 -Key: Name
                 Value: !Sub ${EnvironmentName} private Subnet(AZ1)
 
-    PrivateSubnet1:
+    PrivateSubnet2:
         Type: AWS::EC2::Subnet
         Properties:
             VpcId: !Ref VPC
             AvailabilityZone: !Select [ 1, !GetAZs '' ]
-            CidrBlock: !Ref Privatesubnet2CIDR
+            CidrBlock: !Ref PrivateSubnet2CIDR
             MagPubliconLaunch: true
             Tags:
                 -Key: Name
@@ -129,7 +129,7 @@ Resources:
         Type: AWS::EC2::NatGateway
         Properties:
             AllocationId: !GetAtt NatGateway2EIP.AllocationId
-            SubnetId: !Ref publicSubnet2
+            SubnetId: !Ref PublicSubnet2
 
     PublicRouteTable:
         Type: AWS::EC2::RouteTable
@@ -156,7 +156,7 @@ Resources:
     PublicSubnet2RouteTableAssociation:
         Type: AWS::EC2::SubnetRouteTableAssociation
         Properties:
-            RouteTableId: !Ref publicRouteTable
+            RouteTableId: !Ref PublicRouteTable
             SubnetId: !Ref PublicSubnet2
 
     PrivateRouteTable1:
@@ -178,7 +178,7 @@ Resources:
         Type: AWS::EC2::SubnetRouteTableAssociation
         Properties:
             RouteTableId: !Ref PrivateRouteTable1
-            SubnetId: !Ref PublicSubnet1
+            SubnetId: !Ref PrivateSubnet1
 
     PrivateRouteTable2:
         Type: AWS::EC2::RouteTable
@@ -199,7 +199,7 @@ Resources:
         Type: AWS::EC2::SubnetRouteTableAssociation
         Properties:
             RouteTableId: !Ref PrivateRouteTable2
-            SubnetId: !Ref PublicSubnet2
+            SubnetId: !Ref PrivateSubnet2
 
 Outputs: 
 
@@ -219,13 +219,13 @@ Outputs:
         Description: Private Route AZ1
         Value: !Ref PrivateRouteTable1
         Export:
-            Name: !Sub ${EnvironmentName}-PRVT-RT
+            Name: !Sub ${EnvironmentName}-PRVT1-RT
 
     VPCPrivateRouteTable2:
         Description: Private Route AZ2
         Value: !Ref PrivateRouteTable2
         Export:
-            Name: !Sub ${EnvironmentName}-PRVT-RT
+            Name: !Sub ${EnvironmentName}-PRVT2-RT
     
     PublicSubnets:
         Description: A list of the public subnets
@@ -240,7 +240,7 @@ Outputs:
             Name: !Sub ${EnvironmentName}-PRVT-NETS
     
     PublicSubnet1:
-        Descripton: A reference to the public subnet in the 1st Availability Zone
+        Description: A reference to the public subnet in the 1st Availability Zone
         Value: !Ref PublicSubnet1
         Export:
             Name: !Sub ${EnvironmentName}-PUB1-SN
@@ -255,14 +255,14 @@ Outputs:
         Description: A reference to the private subnet in the 1st  Availability Zone
         Value: !Ref PrivateSubnet1
         Export:
-            Name: !Sub ${EnvironmentName}-PRV-SN
+            Name: !Sub ${EnvironmentName}-PRV1-SN
 
     
     PrivateSubnet2:
         Description: A reference to the private subnet in the 2nd  Availability Zone
         Value: !Ref PrivateSubnet2
         Export:
-            Name: !Sub ${EnvironmentName}-PRV-SN
+            Name: !Sub ${EnvironmentName}-PRV2-SN
 
     
 
