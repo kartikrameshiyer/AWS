@@ -91,7 +91,7 @@ Resources:
             VpcId: !Ref VPC
             AvailabilityZone: !Select [ 0, !GetAZs '' ]
             CidrBlock: !Ref PrivateSubnet1CIDR
-            MagPubliconLaunch: true
+            MagPublicOnLaunch: true
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName} private Subnet(AZ1)
@@ -102,7 +102,7 @@ Resources:
             VpcId: !Ref VPC
             AvailabilityZone: !Select [ 1, !GetAZs '' ]
             CidrBlock: !Ref PrivateSubnet2CIDR
-            MagPubliconLaunch: true
+            MagPublicOnLaunch: true
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName} Public Subnet(AZ2)
