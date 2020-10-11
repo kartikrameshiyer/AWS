@@ -71,8 +71,8 @@ Resources:
             CidrBlock: !Ref PublicSubnet1CIDR
             MapPublicIpOnLaunch: true
             Tags: 
-                -Key: Name 
-                Value: !Sub ${EnvironmentName} Public Subnet1 (AZ1)
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} Public Subnet1 (AZ1)
     
     PublicSubnet2:
         Type: AWS::EC2::Subnet
@@ -80,10 +80,10 @@ Resources:
             VpcId: !Ref VPC
             AvailabilityZone: !Select [ 1, !GetAZs '' ]
             CidrBlock: !Ref PublicSubnet2CIDR
-            MagPubliconLaunch: true
+            MagPublicOnLaunch: true
             Tags:
-                -Key: Name
-                Value: !Sub ${EnvironmentName} Public Subnet2 (AZ2)
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Public Subnet2 (AZ2)
 
     PrivateSubnet1:
         Type: AWS::EC2::Subnet
@@ -93,8 +93,8 @@ Resources:
             CidrBlock: !Ref PrivateSubnet1CIDR
             MagPubliconLaunch: true
             Tags:
-                -Key: Name
-                Value: !Sub ${EnvironmentName} private Subnet(AZ1)
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} private Subnet(AZ1)
 
     PrivateSubnet2:
         Type: AWS::EC2::Subnet
@@ -104,8 +104,8 @@ Resources:
             CidrBlock: !Ref PrivateSubnet2CIDR
             MagPubliconLaunch: true
             Tags:
-                -Key: Name
-                Value: !Sub ${EnvironmentName} Public Subnet(AZ2)
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} Public Subnet(AZ2)
 
     NatGateway1EIP:
         Type: AWS::EC2::EIP
