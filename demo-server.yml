@@ -15,7 +15,7 @@ Resources:
     Properties:
       GroupDescription: Allow HTTP Traffic to load balancer
       VpcId:
-        Fn: ImportValue:
+        Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
       - IpProtocol: tcp
@@ -33,14 +33,14 @@ Resources:
     Properties:
       GroupDescription: Allow Http to the host and ssh from local
       VpcId:
-        Fn: ImportValue:
+        Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 8080
         ToPort: 8080
         CidrIp: 0.0.0.0/0
-      -IpProtocol: tcp
+      - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
