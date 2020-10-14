@@ -28,8 +28,30 @@ Resources:
         ToPort: 80
         CidrIp: 0.0.0.0/0
 
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our hosts and SSH from local only
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+
   WebSecGroup:
-    Type: AWS::EC2:SecurityGroup
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow Http to the host and ssh from local
       VpcId:
@@ -63,7 +85,6 @@ Resources:
           echo "Udacity Demo Web Server Up and Running!" > index.html
 
       ImageId: ami-005bdb005fb00e791
-      IamInstanceProfile: !Ref ProfileWithRolesForOurApp
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.small
