@@ -61,7 +61,7 @@ Resources:
           systemctl start apache2.service
           cd /var/www/html
           echo "It works! Udagram Udacity" > index.html  
-      ImageId: ami-005bdb005fb00e791
+      ImageId: ami-07a29e5e945228fa1
       KeyName: Test
       SecurityGroups:
       - Ref: WebServerSecGroup
