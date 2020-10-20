@@ -49,6 +49,47 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
+          
+  UdacityS3ReadOnlyEC2: 
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: 2012-10-17
+        Statement: 
+          - 
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      RoleName: UdacityS3ReadOnlyEC2
+      ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+
+  RolePolicies: 
+    Type: AWS::IAM::Policy
+    Properties: 
+      PolicyName: !Sub ${EnvironmentName}-S3policy
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: Allow
+            Action: "*"
+            Resource: "*"
+            
+      Roles: 
+        - 
+          Ref: UdacityS3ReadOnlyEC2
+
+  ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+        Roles:
+          - !Ref UdacityS3ReadOnlyEC2
+            
 
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -57,10 +98,12 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt-get update -y
+          apt-get install unzip awscli -y
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          echo "It works! Udagram Udacity" > index.html  
+          aws s3 cp s3://udacity-demo-check/Webpage.zip .
+          unzip -o Webpage.zip 
       ImageId: ami-07a29e5e945228fa1
       KeyName: Test
       SecurityGroups:
@@ -70,7 +113,8 @@ Resources:
       - DeviceName: "/dev/sdk"
         Ebs:
           VolumeSize: '10'
-    
+
+        
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -131,3 +175,11 @@ Resources:
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+
+Outputs:
+
+  LBservers: 
+          Description: To get the LB URL
+          Value: !GetAtt WebAppLB.DNSName
+ 
+ 
