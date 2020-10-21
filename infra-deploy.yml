@@ -262,10 +262,11 @@ Outputs:
         Export:
             Name: !Sub ${EnvironmentName}-PRV2-SN
 
- #       Description:  To get the VPC ID to be used for bastion deployment
-#      Value:
- #           Ref: PublicSubnet1
- #       Export:
-  #          Name: 
-   #             Fn::Sub: ${EnvironmentName}-bastion
+    BastionHost:
+        Description:  To get the VPC ID to be used for bastion deployment
+        Value:
+                Ref: PublicSubnet1
+        Export:
+            Name: 
+                Fn::Sub: ${EnvironmentName}-bastion
     

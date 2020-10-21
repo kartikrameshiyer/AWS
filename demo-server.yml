@@ -59,11 +59,10 @@ Resources:
           systemctl start apache2.service
           apt-get install zip -y
           cd /var/www/html
-          aws s3 cp s3://udacity-demo-check/Webpage.zip .
-          unzip -o Webpage.zip 
+          aws s3 cp s3://udacity-demo-check/udacity.zip .
+          unzip -o udacity.zip 
       ImageId: ami-07a29e5e945228fa1
-      IamInstanceProfile: !Ref ProfileWithRolesForOurApp 
-      KeyName: Test   
+      IamInstanceProfile: !Ref ProfileWithRolesForOurApp  
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.small
@@ -201,11 +200,31 @@ Resources:
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+#------------------Bastion Host--------
 
-#------------------Output--------
+  BastionStation: 
+    Type: AWS::EC2::Instance
+    DependsOn: WebAppGroup2
+    Properties: 
+      ImageId: ami-07a29e5e945228fa1
+      KeyName: Bastion
+      InstanceType: t3.small
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          SubnetId:
+            Fn::ImportValue:
+              Fn::Sub: ${EnvironmentName}-bastion
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-Bastion Station
 
 Outputs:
 
-  LBservers: 
-          Description: To get the LB URL
-          Value: !Join ["", ["http://", !GetAtt [WebAppLB, DNSName]]]
+      LBservers: 
+              Description: To get the LB URL
+              Value: !Join ["", ["http://", !GetAtt [WebAppLB, DNSName]]]
+
+      BastionIp:
+              Description: To Get Public IP of EC2
+              Value: !GetAtt BastionStation.PublicIp
