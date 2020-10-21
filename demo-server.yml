@@ -50,45 +50,35 @@ Resources:
         ToPort: 65535
         CidrIp: 0.0.0.0/0
           
-  UdacityS3ReadOnlyEC2: 
+  UdacityS3ReadOnlyEC2:
     Type: AWS::IAM::Role
-    Properties: 
-      AssumeRolePolicyDocument: 
-        Version: 2012-10-17
-        Statement: 
-          - 
-            Effect: Allow
+    Properties:
+      RoleName: UdacityS3ReadOnlyEC2
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
             Principal:
               Service:
-                - ec2.amazonaws.com
+                - "ec2.amazonaws.com"
             Action:
-              - sts:AssumeRole
-      Path: /
-      RoleName: UdacityS3ReadOnlyEC2
-      ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-
-  RolePolicies: 
-    Type: AWS::IAM::Policy
-    Properties: 
-      PolicyName: !Sub ${EnvironmentName}-S3policy
-      PolicyDocument: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Effect: Allow
-            Action: "*"
-            Resource: "*"
-            
-      Roles: 
-        - 
-          Ref: UdacityS3ReadOnlyEC2
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "S3ReadOnlyAccess"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                Resource: "*"
 
   ProfileWithRolesForOurApp:
     Type: AWS::IAM::InstanceProfile
-    Properties:
-        Roles:
-          - !Ref UdacityS3ReadOnlyEC2
+    Properties: 
+      Roles:
+        - !Ref UdacityS3ReadOnlyEC2
+    DependsOn: UdacityS3ReadOnlyEC2
             
 
   WebAppLaunchConfig:
@@ -102,10 +92,10 @@ Resources:
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          aws s3 cp s3://udacity-demo-check/Webpage.zip .
+          aws s3 cp s3://udacity-demo-check/Webpage.zip ./
           unzip -o Webpage.zip 
       ImageId: ami-07a29e5e945228fa1
-      KeyName: Test
+      IamInstanceProfile: !Ref ProfileWithRolesForOurApp    
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.small
@@ -113,20 +103,45 @@ Resources:
       - DeviceName: "/dev/sdk"
         Ebs:
           VolumeSize: '10'
+       
+  WebAppGroup1:
 
-        
-  WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       VPCZoneIdentifier:
       - Fn::ImportValue: 
-          !Sub "${EnvironmentName}-PRVT-NETS"
+          !Sub "${EnvironmentName}-PRV1-SN"
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
       MinSize: '2'
       MaxSize: '5'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
+        
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: 'true'
+          Value: !Sub ${EnvironmentName} Auto Scaling 1  
+
+
+
+  WebAppGroup2:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+      - Fn::ImportValue: 
+          !Sub "${EnvironmentName}-PRV2-SN"
+      LaunchConfigurationName:
+        Ref: WebAppLaunchConfig
+      MinSize: '2'
+      MaxSize: '5'
+      TargetGroupARNs:
+      - Ref: WebAppTargetGroup
+
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: 'true'
+          Value: !Sub ${EnvironmentName} Auto Scaling 2       
 
   WebAppLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -180,6 +195,8 @@ Outputs:
 
   LBservers: 
           Description: To get the LB URL
-          Value: !GetAtt WebAppLB.DNSName
- 
+          Value: !Join ["", ["http://", !GetAtt [WebAppLB, DNSName]]]
+
+             
+
  
