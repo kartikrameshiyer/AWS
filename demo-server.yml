@@ -57,6 +57,7 @@ Resources:
           apt-get install awscli -y
           apt-get install apache2 -y
           systemctl start apache2.service
+          apt-get install zip -y
           cd /var/www/html
           aws s3 cp s3://udacity-demo-check/Webpage.zip .
           unzip -o Webpage.zip 
