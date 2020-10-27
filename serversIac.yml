@@ -1,5 +1,8 @@
-Description: >
-    We created security groups 
+ Description: >
+    We created IAM role for webservers to access S3. 
+    We added loaunch configuration.
+    Added load balancer. 
+    Bastion host
 
 
 Parameters:
@@ -119,10 +122,10 @@ Resources:
     Properties:
       VPCZoneIdentifier:
       - Fn::ImportValue: 
-          !Sub "${EnvironmentName}-PRV1-SN"
+          !Sub "${EnvironmentName}-PRVT-NETS"
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
-      MinSize: '1'
+      MinSize: '2'
       MaxSize: '5'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
@@ -130,25 +133,7 @@ Resources:
       Tags:
         - Key: Name
           PropagateAtLaunch: 'true'
-          Value: !Sub ${EnvironmentName} Auto Scaling 1  
-
-  WebAppGroup2:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      VPCZoneIdentifier:
-      - Fn::ImportValue: 
-          !Sub "${EnvironmentName}-PRV2-SN"
-      LaunchConfigurationName:
-        Ref: WebAppLaunchConfig
-      MinSize: '1'
-      MaxSize: '5'
-      TargetGroupARNs:
-      - Ref: WebAppTargetGroup
-
-      Tags:
-        - Key: Name
-          PropagateAtLaunch: 'true'
-          Value: !Sub ${EnvironmentName} Auto Scaling 2  
+          Value: !Sub ${EnvironmentName} Auto Scaling Group 
 
 #------------------Load Balancer-----------------------
   WebAppLB:
@@ -169,7 +154,7 @@ Resources:
           Ref: WebAppTargetGroup
       LoadBalancerArn:
         Ref: WebAppLB
-      Port: '80'
+      Port: 80
       Protocol: HTTP
 
   ALBListenerRule:
